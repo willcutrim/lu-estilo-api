@@ -5,17 +5,35 @@ class WhatsappService:
         self.token = token
         self.phone_number_id = phone_number_id
 
-    def send_message(self, to: str, message: str):
+    def send_message(self, to: str, order_id: str, name: str):
+        if not to.startswith("+"):
+            to = f"+55{to}"
+
         url = f"https://graph.facebook.com/v18.0/{self.phone_number_id}/messages"
         headers = {
             "Authorization": f"Bearer {self.token}",
             "Content-Type": "application/json"
         }
+    
         payload = {
             "messaging_product": "whatsapp",
-            "to": to,
-            "type": "text",
-            "text": {"body": message}
+            "to": to.replace("+", ""),
+            "type": "template",
+            "template": {
+                "name": "teste",
+                "language": {
+                    "code": "pt_BR"
+                },
+                "components": [
+                    {
+                        "type": "body",
+                        "parameters": [
+                            {"type": "text", "text": name},
+                            {"type": "text", "text": str(order_id)}
+                        ]
+                    }
+                ]
+            }
         }
 
         response = requests.post(url, headers=headers, json=payload)
