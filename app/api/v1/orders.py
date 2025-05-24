@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
+from app.infrastructure.repositories.client_repo import ClientRepository
+from app.infrastructure.repositories.whatsapp_config_repo import WhatsappConfigRepository
 from app.schemas.order import OrderCreate, OrderOut
 from app.infrastructure.repositories.order_repo import OrderRepository
 from app.domain.use_cases.order_uc import (
@@ -8,13 +10,23 @@ from app.domain.use_cases.order_uc import (
     UpdateOrderStatusUseCase, DeleteOrderUseCase
 )
 from app.db.session import get_db
+from app.services.whatsapp_service import WhatsappService
 
 router = APIRouter()
 
 @router.post("/", response_model=OrderOut)
 def create_order(data: OrderCreate, db: Session = Depends(get_db)):
     repo = OrderRepository(db)
-    use_case = CreateOrderUseCase(repo)
+    client_repo = ClientRepository(db)
+    whatsapp_repo = WhatsappConfigRepository(db)
+    
+    use_case = CreateOrderUseCase(
+        repo,
+        client_repo,
+        whatsapp_repo,
+        WhatsappService
+    )
+
     try:
         return use_case.execute(data.client_id, data.items)
     except ValueError as e:

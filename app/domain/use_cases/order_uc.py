@@ -1,9 +1,31 @@
 class CreateOrderUseCase:
-    def __init__(self, repo):
+    def __init__(self, repo, client_repo, whatsapp_config_repo, whatsapp_service_class):
         self.repo = repo
+        self.client_repo = client_repo
+        self.whatsapp_config_repo = whatsapp_config_repo
+        self.WhatsappService = whatsapp_service_class
 
     def execute(self, client_id, items):
-        return self.repo.create_order(client_id, items)
+        order = self.repo.create_order(client_id, items)
+
+        client = self.client_repo.get_by_id(client_id)
+        if not client or not client.telefone:
+            return order
+
+        config = self.whatsapp_config_repo.get_by_empresa_id(client.empresa_id)
+        if not config:
+            return order  # Não envia mensagem se não houver config
+
+        try:
+            service = self.WhatsappService(token=config.token, phone_number_id=config.phone_number_id)
+            message = f"Olá {client.name}, seu pedido #{order.id} foi confirmado com sucesso!"
+            service.send_message(to=client.telefone, message=message)
+        except Exception as e:
+            print(f"[WHATSAPP] Erro ao enviar mensagem: {e}")
+
+        return order
+
+
 
 class GetOrderByIdUseCase:
     def __init__(self, repo):

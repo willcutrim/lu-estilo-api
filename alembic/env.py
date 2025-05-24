@@ -4,13 +4,15 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
 
-# Adiciona o app/ ao path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from app.db.base_models import (
+    Client, Order, OrderItem, Product, User, WhatsappConfig
+)
 
 from app.db.base import Base
 from app.db.session import SQLALCHEMY_DATABASE_URL
 
-# Config Alembic
 config = context.config
 fileConfig(config.config_file_name)
 
