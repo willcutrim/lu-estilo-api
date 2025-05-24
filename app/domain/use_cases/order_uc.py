@@ -14,12 +14,12 @@ class CreateOrderUseCase:
 
         config = self.whatsapp_config_repo.get_by_empresa_id(client.empresa_id)
         if not config:
-            return order  # Não envia mensagem se não houver config
+            return order
 
         try:
             service = self.WhatsappService(token=config.token, phone_number_id=config.phone_number_id)
             message = f"Olá {client.name}, seu pedido #{order.id} foi confirmado com sucesso!"
-            service.send_message(to=client.telefone, message=message)
+            service.send_message(to=client.telefone, order_id=order.id, name=client.name)
         except Exception as e:
             print(f"[WHATSAPP] Erro ao enviar mensagem: {e}")
 
