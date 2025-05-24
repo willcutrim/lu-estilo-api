@@ -12,7 +12,7 @@ from app.db.session import get_db
 
 router = APIRouter()
 
-@router.post("/", response_model=ClientOut)
+@router.post("/create", response_model=ClientOut)
 def create_client(data: ClientCreate, db: Session = Depends(get_db)):
     repo = ClientRepository(db)
     use_case = CreateClientUseCase(repo)

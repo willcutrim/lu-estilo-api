@@ -4,10 +4,11 @@ class ClientBase(BaseModel):
     name: str
     email: EmailStr
     cpf: str
+    telefone: str
 
 
 class ClientCreate(ClientBase):
-    pass
+    empresa_id: int
 
 
 class ClientUpdate(ClientBase):

@@ -7,3 +7,5 @@ class Client(Base):
     name = Column(String, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
     cpf = Column(String, unique=True, index=True, nullable=False)
+    telefone = Column(String, nullable=False)
+    empresa_id = Column(Integer, nullable=False)  
