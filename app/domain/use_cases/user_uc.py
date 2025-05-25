@@ -28,7 +28,7 @@ class AuthenticateUserUseCase(HandleExceptionMixin):
             if not db_user or not verify_password(user.password, db_user.hashed_password):
                 return None
 
-            return create_access_token(data={"sub": db_user.email})
+            return db_user
 
         except Exception as e:
             self.handle_exception(e, "Erro ao autenticar usuário.")

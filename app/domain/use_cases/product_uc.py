@@ -8,8 +8,11 @@ class CreateProductUseCase(HandleExceptionMixin):
         self.repo = repo
 
     def execute(self, data: ProductCreate):
-        new_product = Product(**data.dict())
-        return self.repo.create(new_product)
+        try:
+            new_product = Product(**data.dict())
+            return self.repo.create(new_product)
+        except Exception as e:
+            self.handle_exception(e, "criar produto")
 
 
 class GetFilteredProductsUseCase(HandleExceptionMixin):
@@ -21,7 +24,6 @@ class GetFilteredProductsUseCase(HandleExceptionMixin):
             return self.repo.get_filtered(skip, limit, section, min_price, max_price, available, categoria_id)
         except Exception as e:
             self.handle_exception(e, "filtrar produtos")
-            return []
 
 
 class GetProductByIdUseCase(HandleExceptionMixin):
@@ -33,7 +35,6 @@ class GetProductByIdUseCase(HandleExceptionMixin):
             return self.repo.get_by_id(product_id)
         except Exception as e:
             self.handle_exception(e, "obter produto por ID")
-            return None
 
 
 class UpdateProductUseCase(HandleExceptionMixin):
@@ -45,6 +46,7 @@ class UpdateProductUseCase(HandleExceptionMixin):
             db_product = self.repo.get_by_id(product_id)
             if not db_product:
                 return None
+            
             return self.repo.update(db_product, data.dict())
         except Exception as e:
             self.handle_exception(e, "atualizar produto")
