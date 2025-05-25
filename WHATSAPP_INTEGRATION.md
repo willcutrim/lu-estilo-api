@@ -1,57 +1,43 @@
-# 💬 Integração com WhatsApp Business API
+# 💬 Integração com WhatsApp
 
-Este sistema está integrado com a API do WhatsApp Cloud para envio automático de mensagens em eventos comerciais, como criação de pedidos, envio de orçamentos e promoções.
-
----
-
-## 📦 Pré-requisitos
-
-- Conta no Facebook Business
-- Número registrado na API do WhatsApp (via [https://developers.facebook.com/](https://developers.facebook.com/))
-- Configuração de token, número e templates aprovados
+A API possui integração com WhatsApp para envio automático de mensagens em eventos comerciais, como criação de pedidos, orçamentos e envio de promoções.
 
 ---
 
-## ⚙️ Como funciona
+## ⚙️ Configuração necessária
 
-A integração está encapsulada no serviço:
+Para utilizar a integração, é necessário cadastrar as credenciais de envio da empresa:
 
-```
-app/services/whatsapp_service.py
-```
-
-Os dados de autenticação são armazenados por **empresa**, no modelo:
+### 🔐 Rota para cadastrar credenciais
 
 ```
-app/models/whatsapp_config.py
+POST /whatsapp/config
 ```
+
+### 📥 Payload esperado
+
+```json
+{
+  "empresa_id": 1,
+  "token": "SEU_TOKEN_WHATSAPP",
+  "phone_number_id": "ID_DO_NUMERO",
+  "nome_empresa": "Nome Fantasia"
+}
+```
+
+Esses dados são utilizados internamente para autenticar os envios de mensagens.
 
 ---
 
-## 🔐 Variáveis de ambiente necessárias
-
-No `.env`:
-
-```
-WHATSAPP_TOKEN=seu_token_facebook_api
-WHATSAPP_PHONE_NUMBER_ID=seu_phone_number_id
-```
-
-> Ou configuráveis via banco de dados, por empresa.
-
----
-
-## 📩 Eventos que disparam mensagens
+## 📩 Eventos com envio automático de mensagem
 
 ### ✅ Pedido criado
-
-Ao criar um pedido com:
 
 ```
 POST /orders/
 ```
 
-O sistema envia automaticamente uma mensagem de confirmação ao cliente com os dados do pedido (ex: nome e número).
+Ao criar um novo pedido, o sistema envia uma mensagem automática para o cliente confirmando a criação. A mensagem é baseada em um template e pode conter variáveis como o nome do cliente e número do pedido.
 
 ---
 
@@ -61,80 +47,66 @@ O sistema envia automaticamente uma mensagem de confirmação ao cliente com os 
 POST /orcamentos/
 ```
 
-Também dispara uma mensagem confirmando o envio do orçamento.
+O envio da mensagem ocorre de forma automática, informando que o orçamento foi gerado.
 
 ---
 
-### ✅ Promoção manual
+### ✅ Promoção para clientes da empresa
 
 ```
 POST /whatsapp/promocao
 ```
 
-Envia uma mensagem promocional para **todos os clientes da empresa**.
+Permite enviar uma mensagem para todos os clientes da empresa com um template previamente configurado.
 
-**Payload exemplo:**
+#### 📥 Exemplo de payload:
 
 ```json
 {
   "empresa_id": 1,
   "template": "modelo_teste",
-  "variaveis": ["Olá, {{1}}, aproveite a promoção exclusiva!"],
-  "titulo": "Nova promoção disponível!"
+  "variaveis": ["Olá, {{1}}, aproveite nossa promoção!"],
+  "titulo": "Promoção ativa!"
 }
 ```
 
 ---
 
-## 📤 Envio de mensagem direto (manual)
+## 📤 Envio manual de mensagem
 
 ```
 POST /whatsapp/send
 ```
 
-Envio direto usando dados da empresa e template aprovado.
+Utilize essa rota para enviar uma mensagem manual para um número específico.
 
-**Payload exemplo:**
+#### 📥 Exemplo de payload:
 
 ```json
 {
   "empresa_id": 1,
   "numero": "559999999999",
   "template": "modelo_teste",
-  "variaveis": ["Willyam", "pedido #45"]
+  "variaveis": ["Willyam", "#45"]
 }
 ```
 
 ---
 
-## ✅ Templates
+## 🧱 Templates e Variáveis
 
-As mensagens usam **templates do tipo `template`** cadastrados e aprovados via painel da Meta.
-
-Você pode enviar variáveis do tipo `{{1}}`, `{{2}}`, etc., e configurar `language.code = pt_BR`.
+As mensagens são baseadas em templates com variáveis dinâmicas (`{{1}}`, `{{2}}`...). O sistema preenche essas variáveis com os dados enviados na chamada.
 
 ---
 
 ## 🛑 Tratamento de erros
 
-- Se o token for inválido ou expirado, retorna erro 401
-- Se o template não existir ou tiver erro de preenchimento, retorna erro 400
-- Todas as exceções são tratadas com logs e envio opcional para o Sentry
+- Erros de autenticação com token inválido retornam 401
+- Templates incorretos retornam erro 400
+- As exceções são tratadas e logadas com integração opcional com Sentry
 
 ---
 
 ## 🧪 Testes
 
-Para testar, use o número cadastrado no painel de sandbox e envie templates de exemplo com:
-
-```
-POST /whatsapp/send
-```
-
-Ou crie um pedido real (`/orders/`) para disparar automaticamente.
-
----
-
-## 📞 Suporte Meta API
-
-- Documentação oficial: https://developers.facebook.com/docs/whatsapp
+Para testar o envio, basta cadastrar a configuração da empresa e acionar qualquer um dos endpoints de criação (pedido, orçamento, envio manual ou promoção).
