@@ -9,6 +9,7 @@ API RESTful para gerenciamento comercial da empresa Lu Estilo, desenvolvida com 
 - Python 3.8+
 - PostgreSQL 13+
 - pip
+- Docker (opcional para execução com container)
 
 ---
 
@@ -19,88 +20,138 @@ API RESTful para gerenciamento comercial da empresa Lu Estilo, desenvolvida com 
 ```bash
 git clone https://github.com/seu-usuario/lu-estilo-api.git
 cd lu-estilo-api
-``` 
+```
 
 ### 2. Crie e ative um ambiente virtual
 
-```
+```bash
 python -m venv venv
 source venv/bin/activate  # Linux/macOS
 venv\Scripts\activate     # Windows
 ```
 
 ### 3. Instale as dependências
-```
+
+```bash
 pip install -r requirements.txt
 ```
 
-## 🛠️ Configurar o banco de dados
-### 4. Crie o banco no PostgreSQL (se ainda não tiver)
-```
+---
+
+## 🛠️ Configuração do Banco de Dados
+
+### 4. Criar banco no PostgreSQL
+
+```sql
 CREATE DATABASE lu_db;
 CREATE USER lu_user WITH PASSWORD 'lu_pass';
 GRANT ALL PRIVILEGES ON DATABASE lu_db TO lu_user;
 ```
 
-🗂️ Configuração do Alembic
+### 5. Configurar variável de ambiente
 
-### 5. Configure alembic.ini:
-No arquivo alembic.ini, edite:
-
-```
-sqlalchemy.url = postgresql://lu_user:lu_pass@localhost:5432/lu_db
-```
-
-Ou use variável em env.py com .env:
+Crie um arquivo `.env` com:
 
 ```
 DATABASE_URL=postgresql://lu_user:lu_pass@localhost:5432/lu_db
+SECRET_KEY=sua_chave_jwt
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+REFRESH_TOKEN_EXPIRE_DAYS=7
+SENTRY_DSN=https://seu_dsn@sentry.io/xxxxxx
 ```
-## 📦 Rodar as migrações
-### 6. Gere e aplique as migrações com Alembic
 
-```
-# Se já tiver as versões geradas:
+---
+
+## 📦 Migrations com Alembic
+
+### 6. Rodar as migrações
+
+```bash
 alembic upgrade head
 ```
 
-### 7. Se mudar os models, gere nova versão:
+### 7. Se mudar os models:
 
-```
+```bash
 alembic revision --autogenerate -m "alterações em models"
 alembic upgrade head
 ```
 
-## ▶️ Rodar a API
-### 8. Execute a aplicação
+---
 
+## ▶️ Executar a aplicação
+
+### 8. Rodar localmente com Uvicorn
+
+```bash
+uvicorn app.main:app --reload
 ```
+
+### Ou execute:
+
+```bash
 python run.py
 ```
 
-#### Acesse:
+---
 
- - API: http://localhost:8000
+## 🐳 Executar com Docker
 
- - Docs Swagger: http://localhost:8000/docs
+```bash
+docker build -t lu-api .
+docker run -d -p 8000:8000 --env-file .env lu-api
+```
+
+---
+
+## 🌐 Deploy com Railway
+
+1. Suba para um repositório GitHub
+2. Acesse [railway.app](https://railway.app/)
+3. Crie um projeto e selecione “Deploy from GitHub”
+4. Railway detecta o Dockerfile automaticamente
+5. Configure as variáveis de ambiente no painel
+
+---
+
+## 🔐 Autenticação & Permissões
+
+- JWT com `access_token` e `refresh_token`
+- Endpoint de login: `POST /auth/login`
+- Endpoint de refresh: `POST /auth/refresh-token`
+- Use o botão "Authorize" no Swagger com seu token
+- Níveis de acesso: **usuário comum** e **admin**
+- Rotas de criação/edição/deleção são protegidas com `only_admin`
+
+---
+
+## 📡 Monitoramento de Erros
+
+Sentry integrado para capturar exceções automaticamente.
+
+---
 
 ## 📁 Estrutura do Projeto
 
 ```
 app/
 ├── api/                # Rotas FastAPI
-├── domain/             # Casos de uso e interfaces (Clean Architecture)
-├── infrastructure/     # Repositórios com SQLAlchemy
-├── models/             # Tabelas do banco
-├── schemas/            # Schemas Pydantic
-├── db/                 # Base e sessão do banco
-├── core/               # Segurança, JWT etc.
-alembic/                # Migrações
+├── domain/             # Casos de uso e interfaces
+├── infrastructure/     # Repositórios (SQLAlchemy)
+├── models/             # Models do banco
+├── schemas/            # Pydantic Schemas
+├── db/                 # Base e sessão SQLAlchemy
+├── core/               # JWT, segurança, configurações
+├── services/           # Integrações (ex: WhatsApp)
+├── utils/              # Mixin e handlers genéricos
+alembic/                # Migrations
 ```
+
+---
 
 ## 🧪 Comandos úteis
 
-```
+```bash
 # Criar nova versão da migração
 alembic revision --autogenerate -m "mensagem"
 
@@ -108,19 +159,23 @@ alembic revision --autogenerate -m "mensagem"
 alembic upgrade head
 ```
 
+---
+
 ## 📦 Tecnologias
+
 - FastAPI
-
 - SQLAlchemy
-
 - Alembic
-
 - Pydantic
-
 - PostgreSQL
+- Docker
+- Sentry
+
+---
 
 ## 👨‍💻 Autor
-Willyam Cutrim
-GitHub: @willcutrim
 
-Deus seja louvado.
+Willyam Cutrim  
+GitHub: [@willcutrim](https://github.com/willcutrim)
+
+> 🙌 Deus seja louvado.
