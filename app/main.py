@@ -3,6 +3,9 @@ from app.api.v1 import (
     auth_routes, clients, products, orders, whatsapp, orcamentos,
     promocoes, categorias
 )
+from config.sentry_config import init_sentry
+
+init_sentry()  
 
 app = FastAPI(title="Lu Estilo API", version="1.0.0")
 
