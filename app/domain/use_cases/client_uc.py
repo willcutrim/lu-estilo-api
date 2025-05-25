@@ -34,8 +34,10 @@ class UpdateClientUseCase:
 
     def execute(self, client_id, data: ClientUpdate):
         db_client = self.repo.get_by_id(client_id)
+
         if not db_client:
             return None
+        
         return self.repo.update(db_client, data.dict())
 
 
@@ -45,7 +47,9 @@ class DeleteClientUseCase:
 
     def execute(self, client_id):
         db_client = self.repo.get_by_id(client_id)
+
         if not db_client:
             return None
+        
         self.repo.delete(db_client)
         return True

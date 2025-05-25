@@ -48,8 +48,10 @@ def update_client(client_id: int, data: ClientUpdate, db: Session = Depends(get_
     repo = ClientRepository(db)
     use_case = UpdateClientUseCase(repo)
     client = use_case.execute(client_id, data)
+
     if not client:
         raise HTTPException(status_code=404, detail="Cliente não encontrado.")
+    
     return client
 
 @router.delete("/{client_id}")
