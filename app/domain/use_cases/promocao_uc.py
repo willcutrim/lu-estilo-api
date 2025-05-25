@@ -1,4 +1,7 @@
-class EnviarPromocaoUseCase:
+from app.services.mixins.sentry_mixin import HandleExceptionMixin
+
+
+class EnviarPromocaoUseCase(HandleExceptionMixin):
     def __init__(self, client_repo, whatsapp_repo, whatsapp_service_class):
         self.client_repo = client_repo
         self.whatsapp_repo = whatsapp_repo
@@ -29,4 +32,4 @@ class EnviarPromocaoUseCase:
                     variables=[mensagem]
                 )
             except Exception as e:
-                print(f"[WHATSAPP] Erro com cliente {cliente.name}: {e}")
+                self.handle_exception(e, "enviar mensagem via WhatsApp")

@@ -1,4 +1,7 @@
-class CreateOrderUseCase:
+from app.services.mixins.sentry_mixin import HandleExceptionMixin
+
+
+class CreateOrderUseCase(HandleExceptionMixin):
     def __init__(self, repo, client_repo, whatsapp_config_repo, whatsapp_service_class):
         self.repo = repo
         self.client_repo = client_repo
@@ -24,36 +27,44 @@ class CreateOrderUseCase:
                 variables=[client.name, str(order.id)]
             )
         except Exception as e:
-            print(f"[WHATSAPP] Erro ao enviar mensagem: {e}")
+            self.handle_exception(e, "enviar mensagem via WhatsApp")
 
         return order
 
 
-
-class GetOrderByIdUseCase:
+class GetOrderByIdUseCase(HandleExceptionMixin):
     def __init__(self, repo):
         self.repo = repo
 
     def execute(self, order_id):
         return self.repo.get_by_id(order_id)
 
-class ListOrdersUseCase:
+class ListOrdersUseCase(HandleExceptionMixin):
     def __init__(self, repo):
         self.repo = repo
 
     def execute(self, skip=0, limit=10):
-        return self.repo.list_orders(skip, limit)
+        try:
+            return self.repo.list_orders(skip, limit)
+        except Exception as e:
+            self.handle_exception(e, "listar pedidos")
 
-class UpdateOrderStatusUseCase:
+class UpdateOrderStatusUseCase(HandleExceptionMixin):
     def __init__(self, repo):
         self.repo = repo
 
     def execute(self, order_id, status):
-        return self.repo.update_order_status(order_id, status)
+        try:
+            return self.repo.update_order_status(order_id, status)
+        except Exception as e:
+            self.handle_exception(e, "atualizar status do pedido")
 
-class DeleteOrderUseCase:
+class DeleteOrderUseCase(HandleExceptionMixin):
     def __init__(self, repo):
         self.repo = repo
 
     def execute(self, order_id):
-        return self.repo.delete_order(order_id)
+        try:
+            return self.repo.delete_order(order_id)
+        except Exception as e:
+            self.handle_exception(e, "deletar pedido")

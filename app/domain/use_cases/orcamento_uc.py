@@ -1,4 +1,7 @@
-class CreateOrcamentoUseCase:
+from app.services.mixins.sentry_mixin import HandleExceptionMixin
+
+
+class CreateOrcamentoUseCase(HandleExceptionMixin):
     def __init__(self, repo, client_repo, whatsapp_repo, whatsapp_service_class):
         self.repo = repo
         self.client_repo = client_repo
@@ -22,6 +25,6 @@ class CreateOrcamentoUseCase:
                 variables=[cliente.name, str(orcamento.id)]
             )
         except Exception as e:
-            print(f"[WHATSAPP] Falha ao enviar orçamento: {e}")
+            self.handle_exception(e, "mensagem via WhatsApp")
 
         return orcamento

@@ -1,0 +1,1 @@
+ERRO_GENERICO = ("Ocorreu um erro inesperado ao %s. Tente novamente mais tarde.")
