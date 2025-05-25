@@ -6,16 +6,26 @@ class ProductRepository(IProductRepository):
     def __init__(self, db):
         self.db = db
 
-    def get_filtered(self, skip=0, limit=10, section=None, min_price=None, max_price=None, available=None):
+    def get_filtered(
+        self, skip=0, limit=10, section=None,
+        min_price=None, max_price=None, available=None, categoria_id=None
+    ):
         query = self.db.query(Product)
         if section:
             query = query.filter(Product.section.ilike(f"%{section}%"))
+
         if min_price is not None:
             query = query.filter(Product.price >= min_price)
+
         if max_price is not None:
             query = query.filter(Product.price <= max_price)
+
         if available is not None:
             query = query.filter(Product.available == available)
+
+        if categoria_id is not None:
+            query = query.filter(Product.categoria_id == categoria_id)
+            
         return query.offset(skip).limit(limit).all()
 
     def get_by_id(self, product_id):

@@ -1,4 +1,6 @@
-from sqlalchemy import Column, Integer, String, Float, Date, Boolean
+from sqlalchemy import Column, ForeignKey, Integer, String, Float, Date, Boolean
+from sqlalchemy.orm import relationship
+
 from app.db.base import Base
 
 class Product(Base):
@@ -12,3 +14,6 @@ class Product(Base):
     expiration_date = Column(Date, nullable=True)
     available = Column(Boolean, default=True)
     image_url = Column(String, nullable=True)
+
+    categoria_id = Column(Integer, ForeignKey("categorias.id"), nullable=True)
+    categoria = relationship("Categoria")

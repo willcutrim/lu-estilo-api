@@ -25,11 +25,12 @@ def get_products(
     min_price: Optional[float] = None,
     max_price: Optional[float] = None,
     available: Optional[bool] = None,
+    categoria_id: Optional[int] = None,
     db: Session = Depends(get_db)
 ):
     repo = ProductRepository(db)
     use_case = GetFilteredProductsUseCase(repo)
-    return use_case.execute(skip=skip, limit=limit, section=section, min_price=min_price, max_price=max_price, available=available)
+    return use_case.execute(skip, limit, section, min_price, max_price, available, categoria_id)
 
 @router.get("/{product_id}", response_model=ProductOut)
 def get_product_by_id(product_id: int, db: Session = Depends(get_db)):
