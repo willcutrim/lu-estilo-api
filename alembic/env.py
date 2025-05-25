@@ -7,7 +7,7 @@ from alembic import context
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from app.db.base_models import (
-    Client, Order, OrderItem, Product, User, WhatsappConfig
+    Client, Order, OrderItem, Product, User, WhatsappConfig, Orcamento, Categoria
 )
 
 from app.db.base import Base

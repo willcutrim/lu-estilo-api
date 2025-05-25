@@ -18,8 +18,11 @@ class CreateOrderUseCase:
 
         try:
             service = self.WhatsappService(token=config.token, phone_number_id=config.phone_number_id)
-            message = f"Olá {client.name}, seu pedido #{order.id} foi confirmado com sucesso!"
-            service.send_message(to=client.telefone, order_id=order.id, name=client.name)
+            service.send_message(
+                to=client.telefone,
+                template_name="teste",
+                variables=[client.name, str(order.id)]
+            )
         except Exception as e:
             print(f"[WHATSAPP] Erro ao enviar mensagem: {e}")
 
