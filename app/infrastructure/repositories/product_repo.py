@@ -1,3 +1,5 @@
+from sqlalchemy.exc import IntegrityError
+
 from app.domain.interfaces.product_interface import IProductRepository
 from app.models.product import Product
 
@@ -45,5 +47,9 @@ class ProductRepository(IProductRepository):
         return db_product
 
     def delete(self, db_product):
-        self.db.delete(db_product)
-        self.db.commit()
+        try:
+            self.db.delete(db_product)
+            self.db.commit()
+
+        except IntegrityError:
+            raise ValueError("Este produto está vinculado a um pedido e não pode ser excluído.")

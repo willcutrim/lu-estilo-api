@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15
+    container_name: postgres_lu_estilo
+    restart: always
+    environment:
+      POSTGRES_USER: lu_user
+      POSTGRES_PASSWORD: lu_pass
+      POSTGRES_DB: lu_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
